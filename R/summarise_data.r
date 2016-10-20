@@ -78,7 +78,7 @@ calculate_DAU_MAU_ratio <- function(MAU_count_by_month
     , roll = T
   ][
 
-    , (DAU_to_MAU_ratio = mean(DAU_count)/mean(MAU_count))
+    , .(DAU_to_MAU_ratio = mean(DAU_count)/mean(MAU_count))
     , by = month_beginning_date 
   ]
 }
