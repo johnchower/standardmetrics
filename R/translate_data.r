@@ -57,8 +57,7 @@ loop_calculate_active_users <- function(date_ranges
 #' @import data.table
 
 find_relative_pa_datetimes <- function(upd){
-  upd_1 <- upd
-  upd_1[
+  upd[
     , date := lubridate::date(datetime)
   ][
     , c("user_id", "signup_datetime", "signup_date") := .(user_id, min(datetime), min(date))
@@ -70,5 +69,30 @@ find_relative_pa_datetimes <- function(upd){
              , difftime(date, signup_date, units = 'days'))
   ][
     , .(user_id, relative_datetime, relative_date)
+  ]
+}
+
+#' Classify users as 1d7 or regular.
+#'
+#' @param updr A data frame: (user_id, relative_datetime, relative_date). The
+#' result of calling find_relative_pa_datetimes.
+#' @return A data frame: (user_id, 1d7). The field 1d7 is logical; true if the
+#' user returned to Gloo in their first week after signup and false otherwise.
+#' @import data.table
+
+classify_1d7s <- function(updr){
+  updr[
+    , c('user_id'
+        , 'day_1_action'
+        , 'week_1_action') :=
+      .(user_id
+        , relative_datetime >= 30 & relative_datetime <= 24*60
+        , relative_date >= 2 & relative_date <= 7)
+  ][
+    , "oneD7" :=
+      .(any(day_1_action) | any(week_1_action))
+    , by = user_id
+  ][
+    , .(user_id, oneD7)
   ]
 }
