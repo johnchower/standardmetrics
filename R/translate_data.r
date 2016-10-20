@@ -43,3 +43,32 @@ loop_calculate_active_users <- function(date_ranges
            calculate_active_users(..., r)
          })
 }
+
+#' Convert platform action datetimes to difftimes relative to first platform
+#' action, and relative to first day.
+#'
+#' @param upd A data frame: (user_id, datetime) where datetime is a chron
+#' object representing the moment a platform action was taken.
+#' @return A data frame: (user_id, relative_time, relative_date) where
+#' relative_* are difftime objects. relative_time represents the amount of seconds that have
+#' passed since their first platform action. relative_date represents the
+#' amount of days that have passed since the first day of their platform
+#' action.
+#' @import data.table
+
+find_relative_pa_datetimes <- function(upd){
+  upd_1 <- upd
+  upd_1[
+    , date := lubridate::date(datetime)
+  ][
+    , c("user_id", "signup_datetime", "signup_date") := .(user_id, min(datetime), min(date))
+    , by = user_id
+  ][
+    , c('user_id', 'relative_datetime', 'relative_date') 
+        := .(user_id
+             , difftime(datetime, signup_datetime, units = 'mins')
+             , difftime(date, signup_date, units = 'days'))
+  ][
+    , .(user_id, relative_datetime, relative_date)
+  ]
+}

@@ -44,7 +44,7 @@ define_date_ranges <- function(base_date = Sys.Date()){
 #' platform_action_date_column.
 #' @importFrom dplyr %>%
 
-extract_user_platform_action_date_data <- function(){
+extract_user_pa_date <- function(){
   x <- glootility::run_look_list(standardmetrics::sessiondate_looks)
   champs <- dplyr::mutate(
               x[['user_session_date_champions']]
@@ -73,4 +73,19 @@ extract_user_platform_action_date_data <- function(){
   as.data.table(z)
 }
 
+#' Download session_datetime data from Looker, and format date and time columns
+#' correctly.
+#' 
+#' @return A data frame with columns user_id, date, time.
+
+extract_user_pa_datetime <- function(){
+  x <- glootility::run_look_list(standardmetrics::sessiondatetime_looks)
+  y  <- dplyr::mutate(
+          x[["user_session_date_time"]]
+          , user_id = user_dimensions.id
+          , datetime = session_duration_fact.timestamp_time
+        )
+  z <- dplyr::select(y, user_id, datetime)
+  as.data.table(z)
+}
 

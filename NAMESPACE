@@ -2,3 +2,4 @@
 
 import(data.table)
 importFrom(dplyr,"%>%")
+importFrom(magrittr,"%>%")
