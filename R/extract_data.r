@@ -26,15 +26,18 @@ define_date_ranges <- function(base_date = Sys.Date()){
                                , to = most_recent_month
                                , by = 'months')
 
+  Days_for_months <- seq.Date(from = min(Months_beginning)
+                              , to = max(Months_beginning) - 1
+                              , by = 'days')
   list(days = 
          data.table::data.table(range_beginning_date = Days)
-                                # , rollDate = Days)
        , weeks_beginning = 
            data.table::data.table(range_beginning_date = Weeks_beginning)
-                                  # , rollDate = Weeks_beginning)
        , months_beginning = 
-           data.table::data.table(range_beginning_date = Months_beginning))
-                                  # , rollDate = Months_beginning))
+           data.table::data.table(range_beginning_date = Months_beginning)
+       , days_for_months = 
+           data.table::data.table(range_beginning_date = Days_for_months)
+  )
 }
 
 #' Download user_platform_action_date data from Looker, and format date column
