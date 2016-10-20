@@ -27,7 +27,7 @@ define_date_ranges <- function(base_date = Sys.Date()){
                                , by = 'months')
 
   Days_for_months <- seq.Date(from = min(Months_beginning)
-                              , to = max(Months_beginning) - 1
+                              , to = max(Months_beginning) 
                               , by = 'days')
   list(days = 
          data.table::data.table(range_beginning_date = Days)
