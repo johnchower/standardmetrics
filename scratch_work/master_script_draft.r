@@ -25,3 +25,6 @@ user_oneD7 <- relative_pa_datetimes %>%
 
 signup_count <- count_signups(relative_pa_datetimes
                               , user_oneD7)
+
+user_retention_data <- get_user_retention_data(relative_pa_datetimes
+                                               , user_oneD7)

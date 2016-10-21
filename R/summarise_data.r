@@ -105,13 +105,13 @@ count_signups <- function(relative_pa_datetimes
   rpd <- data.table::copy(relative_pa_datetimes)
   u1 <- data.table::copy(user_oneD7)
 
-  x <- rpd[
+  user_signup_date <- rpd[
 
     , .(signup_date = min(signup_date))
     , by = user_id
   ]
 
-  data.table::setkey(x, user_id)
+  data.table::setkey(user_signup_date, user_id)
   data.table::setkey(u1, user_id)
 
   weeks_beginning <- data.table::data.table(
@@ -123,11 +123,11 @@ count_signups <- function(relative_pa_datetimes
   weeks_beginning[, rollDate := range_beginning_date]
   data.table::setkey(weeks_beginning, rollDate)
 
-  y <- u1[x][, rollDate := signup_date]
+  user_signup_week <- u1[user_signup_date][, rollDate := signup_date]
 
-  data.table::setkey(y, rollDate)
+  data.table::setkey(user_signup_week, rollDate)
 
-  weeks_beginning[y, roll = T][
+  weeks_beginning[user_signup_week, roll = T][
     
     , .(
         number_of_signups = length(unique(user_id))  
@@ -147,5 +147,65 @@ count_signups <- function(relative_pa_datetimes
        , number_of_1d7_signups
        , number_of_1d7_signups/number_of_signups
     )
+  ]
+}
+
+#' Get user retention data (1d7s vs all).
+#'
+#' @param relative_pa_datetimes A data frame: (user_id, datetime) giving the
+#' moments when a user took a platform action.
+#' @param user_oneD7 A data frame: (user_id oneD7) that tells us which users
+#' are 1D7s.
+#' @param max_date The most recent date of activity that appears in
+#' sesh_dur_date.
+#' @return A data frame: (weeks_since_signup, pct_users_active)
+#' @import data.table
+
+get_user_retention_data <- function(relative_pa_datetimes
+                                    , user_oneD7
+                                    , max_date = max(sesh_dur_date$platform_action_date)){
+  rpd <- data.table::copy(relative_pa_datetimes)
+  u1 <- data.table::copy(user_oneD7)
+
+  data.table::setkey(rpd, user_id)
+  data.table::setkey(u1, user_id)
+
+  x <- rpd[
+    , c('weeks_since_signup'
+        , 'weeks_eligible'
+      ) :=
+      .(floor(as.numeric(relative_date)/7)
+        , floor(as.numeric(max_date - signup_date)/7)  
+      )
+  ][u1]
+  
+  active_user_count <- x[
+
+    , .(number_of_active_users = length(unique(user_id)) )
+    , by = .(weeks_since_signup, oneD7)
+  ]
+
+  eligible_user_count <- x[
+
+    , .(number_of_eligible_users = length(unique(user_id)) )
+    , by = .(weeks_eligible, oneD7)
+  ][
+    order(desc(weeks_eligible))
+    , cumulative_eligible_users := cumsum(number_of_eligible_users)
+    , by = oneD7
+  ]
+
+
+  data.table::setkey(active_user_count, weeks_since_signup, oneD7)
+  data.table::setkey(eligible_user_count, weeks_eligible, oneD7)
+
+  active_user_count[
+    eligible_user_count
+    , .(percent_active = number_of_active_users/cumulative_eligible_users
+        , number_of_active_users
+        , cumulative_eligible_users
+        , oneD7
+        , weeks_since_signup
+      )
   ]
 }
