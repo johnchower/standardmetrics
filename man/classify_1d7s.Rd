@@ -4,10 +4,11 @@
 \alias{classify_1d7s}
 \title{Classify users as 1d7 or regular.}
 \usage{
-classify_1d7s(updr)
+classify_1d7s(user_pa_datetime_relative)
 }
 \arguments{
-\item{updr}{A data frame: (user_id, relative_datetime, relative_date). The
+\item{user_pa_datetime_relative}{A data frame: 
+(user_id, relative_datetime, relative_date). The
 result of calling find_relative_pa_datetimes.}
 }
 \value{

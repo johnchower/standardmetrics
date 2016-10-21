@@ -5,10 +5,11 @@
 \title{Convert platform action datetimes to difftimes relative to first platform
 action, and relative to first day.}
 \usage{
-find_relative_pa_datetimes(upd)
+find_relative_pa_datetimes(user_platform_action_datetime)
 }
 \arguments{
-\item{upd}{A data frame: (user_id, datetime) where datetime is a chron
+\item{user_platform_action_datetime}{A data frame: (user_id, datetime) 
+where datetime is a chron
 object representing the moment a platform action was taken.}
 }
 \value{

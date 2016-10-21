@@ -12,14 +12,15 @@
 
 calculate_active_users <- function(sesh_dur_data
                                    , range_beginning){
-  sesh_dur_data[, rollDate:= platform_action_date]
-  data.table::setkey(sesh_dur_data, rollDate)
+  copy_sesh_dur_data <- data.table::copy(sesh_dur_data)
+  copy_sesh_dur_data[, rollDate:= platform_action_date]
+  data.table::setkey(copy_sesh_dur_data, rollDate)
 
   range_beginning[, rollDate:= range_beginning_date]
   data.table::setkey(range_beginning, rollDate)
 
   range_beginning[
-    sesh_dur_data
+    copy_sesh_dur_data
     , .(user_id, platform_action_date, range_beginning_date)
     , roll = T
   ][
@@ -55,30 +56,96 @@ loop_calculate_active_users <- function(date_ranges
 
 calculate_DAU_MAU_ratio <- function(MAU_count_by_month
                                     , DAU_count_by_day){
+  copy_MAU_count_by_month <- data.table::copy(MAU_count_by_month)
+  copy_DAU_count_by_day <- data.table::copy(DAU_count_by_day)
 
-  MAU_count_by_month[, c('MAU_count'
-                         , 'month_beginning_date'
-                         , "rollMonth")
-                       := .(number_of_active_users
+  copy_MAU_count_by_month[, c('MAU_count'
+                              , 'month_beginning_date'
+                              , "rollMonth")
+                            := 
+                            .(number_of_active_users
+                              , range_beginning_date
+                              , range_beginning_date)]
+  data.table::setkey(copy_MAU_count_by_month, rollMonth)
+
+  copy_DAU_count_by_day[, c('DAU_count'
+                            , 'day_beginning_date'
+                            , "rollDate")
+                          := 
+                          .(number_of_active_users
                             , range_beginning_date
                             , range_beginning_date)]
-  data.table::setkey(MAU_count_by_month, rollMonth)
+  data.table::setkey(copy_DAU_count_by_day, rollDate)
 
-  DAU_count_by_day[, c('DAU_count'
-                         , 'day_beginning_date'
-                         , "rollDate")
-                       := .(number_of_active_users
-                            , range_beginning_date
-                            , range_beginning_date)]
-  data.table::setkey(DAU_count_by_day, rollDate)
-
-  MAU_count_by_month[
-    DAU_count_by_day 
+  copy_MAU_count_by_month[
+    copy_DAU_count_by_day 
     , .(month_beginning_date, day_beginning_date, MAU_count, DAU_count)
     , roll = T
   ][
 
     , .(DAU_to_MAU_ratio = mean(DAU_count)/mean(MAU_count))
     , by = month_beginning_date 
+  ]
+}
+
+#' Count signups per week (as total, and as perentage of signups).
+#'
+#' @param relative_pa_datetimes A data frame: (user_id, datetime) giving the
+#' moments when a user took a platform action.
+#' @param user_oneD7 A data frame: (user_id oneD7) that tells us which users
+#' are 1D7s.
+#' @return A data frame: (week_beginning, number_of_signups)
+#' @import data.table
+
+count_signups <- function(relative_pa_datetimes
+                          , user_oneD7
+                          , min_date = as.Date('2016-01-01')
+                          , max_date = 
+                              max(date_ranges[['days']]$range_beginning_date)){
+  rpd <- data.table::copy(relative_pa_datetimes)
+  u1 <- data.table::copy(user_oneD7)
+
+  x <- rpd[
+
+    , .(signup_date = min(signup_date))
+    , by = user_id
+  ]
+
+  data.table::setkey(x, user_id)
+  data.table::setkey(u1, user_id)
+
+  weeks_beginning <- data.table::data.table(
+    range_beginning_date = seq.Date(from = min_date
+                                    , to = max_date
+                                    , by = 7)
+  )
+
+  weeks_beginning[, rollDate := range_beginning_date]
+  data.table::setkey(weeks_beginning, rollDate)
+
+  y <- u1[x][, rollDate := signup_date]
+
+  data.table::setkey(y, rollDate)
+
+  weeks_beginning[y, roll = T][
+    
+    , .(
+        number_of_signups = length(unique(user_id))  
+        , number_of_1d7_signups = length(unique(user_id[oneD7])) 
+      )
+    , by = range_beginning_date
+  ][
+
+  , c('range_beginning_date'
+      , 'number_of_signups'
+      , 'number_of_1d7_signups'
+      , 'percent_of_1d7_signups'
+    ) :=
+    .(
+       range_beginning_date
+       , number_of_signups
+       , number_of_1d7_signups
+       , number_of_1d7_signups/number_of_signups
+    )
   ]
 }
