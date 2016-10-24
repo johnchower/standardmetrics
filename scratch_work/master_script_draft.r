@@ -1,7 +1,9 @@
 rm(list = ls())  
 devtools::document()
 devtools::load_all()
+
 glootility::connect_to_lookr()
+library(dplyr)
 
 date_ranges <- define_date_ranges()
 # .sesh_dur_date <- extract_user_pa_date()

@@ -13,6 +13,7 @@
 #' amount of days that have passed since the first day of their platform
 #' action.
 #' @import data.table
+#' @export
 
 find_relative_pa_datetimes <- function(user_platform_action_datetime){
   upd <- data.table::copy(user_platform_action_datetime)
@@ -45,6 +46,7 @@ find_relative_pa_datetimes <- function(user_platform_action_datetime){
 #' @return A data frame: (user_id, 1d7). The field 1d7 is logical; true if the
 #' user returned to Gloo in their first week after signup and false otherwise.
 #' @import data.table
+#' @export
 
 classify_1d7s <- function(user_pa_datetime_relative){
   updr <- data.table::copy(user_pa_datetime_relative)

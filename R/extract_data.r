@@ -6,6 +6,7 @@
 #' @return interval_list A list of (date_interval, functions_to_apply)  pairs.
 #'  See standardmetrics::interval_list for an example of how to format this list.
 #' @import data.table
+#' @export
 
 define_date_ranges <- function(base_date = Sys.Date()
                                , min_date = as.Date('2016-01-01')){
@@ -53,6 +54,7 @@ define_date_ranges <- function(base_date = Sys.Date()
 #' @return A data frame with a user_id column and a
 #' platform_action_date_column.
 #' @importFrom dplyr %>%
+#' @export
 
 extract_user_pa_date <- function(){
   x <- glootility::run_look_list(standardmetrics::sessiondate_looks)
@@ -87,6 +89,7 @@ extract_user_pa_date <- function(){
 #' correctly.
 #' 
 #' @return A data frame with columns user_id, date, time.
+#' @export
 
 extract_user_pa_datetime <- function(){
   x <- glootility::run_look_list(standardmetrics::sessiondatetime_looks)

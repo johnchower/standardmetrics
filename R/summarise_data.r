@@ -37,6 +37,7 @@ calculate_active_users <- function(sesh_dur_data
 #' @return A list of data frames that show the number of active users that fall
 #' within each date range.
 #' @import data.table
+#' @export
 
 loop_calculate_active_users <- function(date_ranges
                                         , ...){
@@ -53,6 +54,7 @@ loop_calculate_active_users <- function(date_ranges
 #' @return A data frame showing the average DAU to MAU ratio for each month
 #' specified by months_to_calc.
 #' @import data.table
+#' @export
 
 calculate_DAU_MAU_ratio <- function(MAU_count_by_month
                                     , DAU_count_by_day){
@@ -98,6 +100,7 @@ calculate_DAU_MAU_ratio <- function(MAU_count_by_month
 #' denote the first days of each date range.
 #' @return A data frame: (week_beginning, number_of_signups)
 #' @import data.table
+#' @export
 
 count_signups <- function(relative_pa_datetimes
                           , user_oneD7
@@ -154,6 +157,7 @@ count_signups <- function(relative_pa_datetimes
 #' sesh_dur_date.
 #' @return A data frame: (weeks_since_signup, pct_users_active)
 #' @import data.table
+#' @export
 
 get_user_retention_data <- function(relative_pa_datetimes
                                     , user_oneD7
