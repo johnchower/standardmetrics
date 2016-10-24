@@ -4,7 +4,7 @@
 \alias{define_date_ranges}
 \title{Return a list of date intervals relative to the current date.}
 \usage{
-define_date_ranges(base_date = Sys.Date())
+define_date_ranges(base_date = Sys.Date(), min_date = as.Date("2016-01-01"))
 }
 \arguments{
 \item{base_date}{A date object.}

@@ -4,9 +4,7 @@
 \alias{count_signups}
 \title{Count signups per week (as total, and as perentage of signups).}
 \usage{
-count_signups(relative_pa_datetimes, user_oneD7,
-  min_date = as.Date("2016-01-01"),
-  max_date = max(date_ranges[["days"]]$range_beginning_date))
+count_signups(relative_pa_datetimes, user_oneD7, range_beginning)
 }
 \arguments{
 \item{relative_pa_datetimes}{A data frame: (user_id, datetime) giving the
@@ -14,6 +12,9 @@ moments when a user took a platform action.}
 
 \item{user_oneD7}{A data frame: (user_id oneD7) that tells us which users
 are 1D7s.}
+
+\item{range_beginning}{A data.table with a single column of dates which 
+denote the first days of each date range.}
 }
 \value{
 A data frame: (week_beginning, number_of_signups)

@@ -94,14 +94,14 @@ calculate_DAU_MAU_ratio <- function(MAU_count_by_month
 #' moments when a user took a platform action.
 #' @param user_oneD7 A data frame: (user_id oneD7) that tells us which users
 #' are 1D7s.
+#' @param range_beginning A data.table with a single column of dates which 
+#' denote the first days of each date range.
 #' @return A data frame: (week_beginning, number_of_signups)
 #' @import data.table
 
 count_signups <- function(relative_pa_datetimes
                           , user_oneD7
-                          , min_date = as.Date('2016-01-01')
-                          , max_date = 
-                              max(date_ranges[['days']]$range_beginning_date)){
+                          , range_beginning){
   rpd <- data.table::copy(relative_pa_datetimes)
   u1 <- data.table::copy(user_oneD7)
 
@@ -114,20 +114,14 @@ count_signups <- function(relative_pa_datetimes
   data.table::setkey(user_signup_date, user_id)
   data.table::setkey(u1, user_id)
 
-  weeks_beginning <- data.table::data.table(
-    range_beginning_date = seq.Date(from = min_date
-                                    , to = max_date
-                                    , by = 7)
-  )
-
-  weeks_beginning[, rollDate := range_beginning_date]
-  data.table::setkey(weeks_beginning, rollDate)
+  range_beginning[, rollDate := range_beginning_date]
+  data.table::setkey(range_beginning, rollDate)
 
   user_signup_week <- u1[user_signup_date][, rollDate := signup_date]
 
   data.table::setkey(user_signup_week, rollDate)
 
-  weeks_beginning[user_signup_week, roll = T][
+  range_beginning[user_signup_week, roll = T][
     
     , .(
         number_of_signups = length(unique(user_id))  

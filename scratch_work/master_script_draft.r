@@ -24,7 +24,13 @@ user_oneD7 <- relative_pa_datetimes %>%
   classify_1d7s
 
 signup_count <- count_signups(relative_pa_datetimes
-                              , user_oneD7)
+                              , user_oneD7
+                              , date_ranges$weeks_beginning)
+
+signup_count_all <- count_signups(relative_pa_datetimes
+                              , user_oneD7
+                              , date_ranges$weeks_beginning_since_20160101
+                              )
 
 user_retention_data <- get_user_retention_data(relative_pa_datetimes
                                                , user_oneD7)

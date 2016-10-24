@@ -7,7 +7,8 @@
 #'  See standardmetrics::interval_list for an example of how to format this list.
 #' @import data.table
 
-define_date_ranges <- function(base_date = Sys.Date()){
+define_date_ranges <- function(base_date = Sys.Date()
+                               , min_date = as.Date('2016-01-01')){
   this_week <- seq.Date(from = base_date - 6
                         , to = base_date
                         , by = 1)
@@ -22,6 +23,10 @@ define_date_ranges <- function(base_date = Sys.Date()){
                               , to = most_recent_friday  
                               , by = 7)
 
+  Weeks_beginning_since_20160101 <- seq.Date(from = min_date
+                                             , to = base_date
+                                             , by = 7)
+
   Months_beginning <- seq.Date(from = as.Date('2016-01-01')
                                , to = most_recent_month
                                , by = 'months')
@@ -33,6 +38,8 @@ define_date_ranges <- function(base_date = Sys.Date()){
          data.table::data.table(range_beginning_date = Days)
        , weeks_beginning = 
            data.table::data.table(range_beginning_date = Weeks_beginning)
+       , weeks_beginning_since_20160101 = 
+           data.table::data.table(range_beginning_date = Weeks_beginning_since_20160101)
        , months_beginning = 
            data.table::data.table(range_beginning_date = Months_beginning)
        , days_for_months = 
