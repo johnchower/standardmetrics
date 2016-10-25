@@ -70,3 +70,36 @@ classify_1d7s <- function(user_pa_datetime_relative){
   setkey(x)
   unique(x)
 }
+
+#' Count the number of distinct days of activity each user had in their first
+#' week.
+#'
+#' @param user_pa_datetime_relative A data frame: 
+#' (user_id, relative_datetime, relative_date). The
+#' result of calling find_relative_pa_datetimes.
+#' @return A data frame: (user_id, user_class). The field 'class' is numeric; it
+#' corresponds to the number of days of activity the user had in their first
+#' week.
+#' @import data.table
+#' @export
+
+count_days_of_activity_week1 <- function(user_pa_datetime_relative){
+  updr <- data.table::copy(user_pa_datetime_relative)
+  x <- updr[
+    , c('user_id'
+        , 'user_class'
+      ) :=
+      .(
+        user_id
+        , length(unique(relative_date[relative_date <= 6]))
+      )
+    , by = user_id
+  ][
+    , .(user_id, user_class)
+  ]
+
+
+
+  setkey(x)
+  unique(x)
+}

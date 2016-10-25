@@ -2,7 +2,9 @@
 
 export(calculate_DAU_MAU_ratio)
 export(classify_1d7s)
+export(count_days_of_activity_week1)
 export(count_signups)
+export(count_signups_multiclass)
 export(define_date_ranges)
 export(extract_user_pa_date)
 export(extract_user_pa_datetime)

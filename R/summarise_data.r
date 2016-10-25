@@ -147,6 +147,50 @@ count_signups <- function(relative_pa_datetimes
   ]
 }
 
+#' Count signups per week (user classes > 2)
+#'
+#' @param relative_pa_datetimes A data frame: (user_id, datetime) giving the
+#' moments when a user took a platform action.
+#' @param user_classes A data frame: (user_id, user_class) that groups users into
+#' classes.
+#' @param range_beginning A data.table with a single column of dates which 
+#' denote the first days of each date range.
+#' @return A data frame: (week_beginning, number_of_signups)
+#' @import data.table
+#' @export
+
+count_signups_multiclass <- function(relative_pa_datetimes
+                                     , user_classes
+                                     , range_beginning){
+  rpd <- data.table::copy(relative_pa_datetimes)
+  u1 <- data.table::copy(user_classes)
+
+  user_signup_date <- rpd[
+
+    , .(signup_date = min(signup_date))
+    , by = user_id
+  ]
+
+  data.table::setkey(user_signup_date, user_id)
+  data.table::setkey(u1, user_id)
+
+  range_beginning[, rollDate := range_beginning_date]
+  data.table::setkey(range_beginning, rollDate)
+
+  user_signup_week <- u1[user_signup_date][, rollDate := signup_date]
+
+  data.table::setkey(user_signup_week, rollDate)
+
+  range_beginning[user_signup_week, roll = T][
+    
+    , .(
+        number_of_signups = length(unique(user_id))  
+      )
+    , by = .(range_beginning_date, user_class)
+  ]
+ }
+
+
 #' Get user retention data (1d7s vs all).
 #'
 #' @param relative_pa_datetimes A data frame: (user_id, datetime) giving the
@@ -192,7 +236,6 @@ get_user_retention_data <- function(relative_pa_datetimes
     , cumulative_eligible_users := cumsum(number_of_eligible_users)
     , by = oneD7
   ]
-
 
   data.table::setkey(active_user_count, weeks_since_signup, oneD7)
   data.table::setkey(eligible_user_count, weeks_eligible, oneD7)
