@@ -4,10 +4,13 @@
 \alias{define_date_ranges}
 \title{Return a list of date intervals relative to the current date.}
 \usage{
-define_date_ranges(base_date = Sys.Date(), min_date = as.Date("2016-01-01"))
+define_date_ranges(base_date = Sys.Date(), min_date = as.Date("2016-01-01"),
+  week_start = 1)
 }
 \arguments{
 \item{base_date}{A date object.}
+
+\item{week_start}{An integer denoting the first day of the week (1 = Sunday)}
 }
 \value{
 interval_list A list of (date_interval, functions_to_apply)  pairs.

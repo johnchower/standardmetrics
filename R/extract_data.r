@@ -3,25 +3,27 @@
 #' Return a list of date intervals relative to the current date.
 #'
 #' @param base_date A date object.
+#' @param week_start An integer denoting the first day of the week (1 = Sunday)
 #' @return interval_list A list of (date_interval, functions_to_apply)  pairs.
 #'  See standardmetrics::interval_list for an example of how to format this list.
 #' @import data.table
 #' @export
 
 define_date_ranges <- function(base_date = Sys.Date()
-                               , min_date = as.Date('2016-01-01')){
+                               , min_date = as.Date('2016-01-01')
+                               , week_start = 1){
   this_week <- seq.Date(from = base_date - 6
                         , to = base_date
                         , by = 1)
-  most_recent_friday <- this_week[which(lubridate::wday(this_week) == 6)]
+  most_recent_week_start <- this_week[which(lubridate::wday(this_week) == week_start)]
   most_recent_month <- as.Date(format(base_date, '%Y-%m-01')) 
   
-  Days <- seq.Date(from = most_recent_friday - 7
-                   , to = most_recent_friday 
+  Days <- seq.Date(from = most_recent_week_start - 7
+                   , to = most_recent_week_start 
                    , by = 1)
 
-  Weeks_beginning <- seq.Date(from = most_recent_friday - 28
-                              , to = most_recent_friday  
+  Weeks_beginning <- seq.Date(from = most_recent_week_start - 28
+                              , to = most_recent_week_start  
                               , by = 7)
 
   Weeks_beginning_since_20160101 <- seq.Date(from = min_date
