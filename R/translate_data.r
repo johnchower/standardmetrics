@@ -56,7 +56,7 @@ classify_1d7s <- function(user_pa_datetime_relative){
         , 'week_1_action') 
       :=
       .(user_id
-        , relative_datetime >= 30 & relative_datetime <= 24*60
+        , F
         , relative_date >= 1 & relative_date <= 6)
   ][
     , "oneD7" 
