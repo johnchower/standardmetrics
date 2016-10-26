@@ -81,9 +81,7 @@ extract_user_pa_date <- function(){
                           as.Date(user_platform_action_facts.timestamp_date)
                     ) %>%
             dplyr::select(user_id, platform_action_date)
-  
   z <- rbind(champs, end_users, internal_users)
-
   as.data.table(z)
 }
 
