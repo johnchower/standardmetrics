@@ -98,16 +98,24 @@ calculate_DAU_MAU_ratio <- function(MAU_count_by_month
 #' are 1D7s.
 #' @param range_beginning A data.table with a single column of dates which 
 #' denote the first days of each date range.
+#' @param user_set A subset of users to restrict the calculation to. If not set
+#' (ie NULL) then all users available in relative_pa_datetimes are used.
 #' @return A data frame: (week_beginning, number_of_signups)
 #' @import data.table
 #' @export
 
 count_signups <- function(relative_pa_datetimes
                           , user_oneD7
-                          , range_beginning){
+                          , range_beginning
+                          , user_set = NULL){
   rpd <- data.table::copy(relative_pa_datetimes)
   u1 <- data.table::copy(user_oneD7)
 
+  if(!is.null(user_set)){
+    rpd <- rpd[user_id %in% user_set,,]
+    u1  <- u1[user_id %in% user_set,,]
+  }
+ 
   user_signup_date <- rpd[
 
     , .(signup_date = min(signup_date))
@@ -155,15 +163,24 @@ count_signups <- function(relative_pa_datetimes
 #' classes.
 #' @param range_beginning A data.table with a single column of dates which 
 #' denote the first days of each date range.
+#' @param user_set A subset of users to restrict the calculation to. If not set
+#' (ie NULL) then all users available in relative_pa_datetimes are used.
 #' @return A data frame: (week_beginning, number_of_signups)
 #' @import data.table
 #' @export
 
 count_signups_multiclass <- function(relative_pa_datetimes
                                      , user_classes
-                                     , range_beginning){
+                                     , range_beginning
+                                     , user_set = NULL){
+
   rpd <- data.table::copy(relative_pa_datetimes)
   u1 <- data.table::copy(user_classes)
+
+  if(!is.null(user_set)){
+    rpd <- rpd[user_id %in% user_set,,]
+    u1  <- u1[user_id %in% user_set,,]
+  }
 
   user_signup_date <- rpd[
 
@@ -188,8 +205,7 @@ count_signups_multiclass <- function(relative_pa_datetimes
       )
     , by = .(range_beginning_date, user_class)
   ]
- }
-
+}
 
 #' Get user retention data (1d7s vs all).
 #'
