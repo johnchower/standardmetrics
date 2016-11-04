@@ -14,7 +14,8 @@ object representing the moment a platform action was taken.}
 }
 \value{
 A data frame: (user_id, relative_time, relative_date) where
-relative_* are difftime objects. relative_time represents the amount of seconds that have
+relative_* are difftime objects. relative_time represents the amount of 
+seconds that have
 passed since their first platform action. relative_date represents the
 amount of days that have passed since the first day of their platform
 action.

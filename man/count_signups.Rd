@@ -4,7 +4,8 @@
 \alias{count_signups}
 \title{Count signups per week (as total, and as perentage of signups).}
 \usage{
-count_signups(relative_pa_datetimes, user_oneD7, range_beginning)
+count_signups(relative_pa_datetimes, user_oneD7, range_beginning,
+  user_set = NULL)
 }
 \arguments{
 \item{relative_pa_datetimes}{A data frame: (user_id, datetime) giving the
@@ -15,6 +16,9 @@ are 1D7s.}
 
 \item{range_beginning}{A data.table with a single column of dates which 
 denote the first days of each date range.}
+
+\item{user_set}{A subset of users to restrict the calculation to. If not set
+(ie NULL) then all users available in relative_pa_datetimes are used.}
 }
 \value{
 A data frame: (week_beginning, number_of_signups)

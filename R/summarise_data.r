@@ -90,6 +90,63 @@ calculate_DAU_MAU_ratio <- function(MAU_count_by_month
   ]
 }
 
+#' Calculate overall DAU to MAU ratio for a time interval.
+#'
+#' @param months_beginning A data.table (range_beginning_date) of months to
+#' include in the calculation.
+#' @param max_date The largest date to use in the calculation. Any of the
+#' range_beginning_dates in months_beginning which is less than one month
+#' before max_date is dropped.
+#' @param sesh_dur_data A data.table (user_id, platform_action_date).
+#' @return A number representing the overall DAU/MAU ratio for the time
+#' interval (min_date, max_date). The ratio is only calculated for complete
+#' months within the time interval. So for example, (jan 3, march 20) gets
+#' rounded to (feb 1, feb 28).
+#' @import data.table
+#' @export
+
+calculate_overall_ratio <- function(months_beginning
+                                    , max_date = Sys.Date()
+                                    , sesh_dur_data = sesh_dur_date){
+  monthdiff <- function(date1,date2){
+    length(seq(from=date1, to=date2, by='month')) - 1
+  }
+
+  monthdiff2 <- Vectorize(FUN = monthdiff, vectorize.args = "date1")
+
+  months_beginning_copy <- data.table::copy(months_beginning)[
+    , ':='(rollDate = range_beginning_date
+           , month_length = c(diff(range_beginning_date), 0)
+      )
+  ]
+
+  data.table::setkey(months_beginning_copy, rollDate)
+  
+  sesh_dur_data_copy <- data.table::copy(sesh_dur_data)[
+    , rollDate := platform_action_date
+  ]
+
+  data.table::setkey(sesh_dur_data_copy, rollDate)
+
+  months_beginning_copy[
+    sesh_dur_data_copy
+    , .(month_length
+        , range_beginning_date
+        , platform_action_date
+        , user_id
+      )
+    , roll = T
+  ][
+    !is.na(month_length)
+    , .(days_active = length(unique(platform_action_date))
+        , month_days_possible = mean(month_length)
+      )
+    , by = c('user_id', 'range_beginning_date')
+  ][
+    , .(overall_ratio = sum(days_active)/sum(as.numeric(month_days_possible)))
+  ]
+}
+
 #' Count signups per week (as total, and as perentage of signups).
 #'
 #' @param relative_pa_datetimes A data frame: (user_id, datetime) giving the
